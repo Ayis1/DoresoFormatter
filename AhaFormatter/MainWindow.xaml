@@ -20,28 +20,31 @@
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="7*"/>
         </Grid.ColumnDefinitions>
         
         <Button Grid.Row="0" Grid.Column="0" Click="SelectFileClick">
             Select File
         </Button>
-        <TextBox x:Name="FilenameText" Grid.Row="0" Grid.Column="2" IsReadOnly="True" TextAlignment="Left" Text="Select..."/>
+        <TextBox x:Name="FilenameText" Grid.Row="0" Grid.Column="2" IsReadOnly="True" TextAlignment="Left" Text="Select..." Grid.ColumnSpan="3"/>
         <Button Grid.Row="2" Click="SelectOutputFolder">
             Select Output
         </Button>
-        <TextBox x:Name="OutputText" Text="Select..." Grid.Row="2" Grid.Column="2" IsReadOnly="True"/>
-        <TextBox x:Name="Console" TextChanged="Console_TextChanged" Grid.Row="6" Grid.ColumnSpan="3" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+        <TextBox x:Name="OutputText" Text="Select..." Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3" IsReadOnly="True"/>
+        <TextBox x:Name="Console" TextChanged="Console_TextChanged" Grid.Row="6" Grid.ColumnSpan="5" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
         <Button x:Name="ParseCSVBtn" Grid.Row="4" IsEnabled="False" Click="ParseCSV">
             Parse CSV
         </Button>
         <Button Grid.Row="8" Click="ClearConsole">
             Clear console
         </Button>
-        <Button x:Name="CreatePlaylist" Grid.Row="8" Grid.Column="3" Width="150" HorizontalAlignment="Left" IsEnabled="False" Click="CreatePlaylist_Click">
+        <Button x:Name="CreatePlaylist" Grid.Row="8" Grid.Column="2" Width="150" HorizontalAlignment="Left" IsEnabled="False" Click="CreatePlaylist_Click">
             Create Youtube playlist
         </Button>
+        <TextBox Grid.Column="4" x:Name="playListName" Grid.Row="8" Text="Enter new playlist name" IsEnabled="False"/>
     </Grid>
 </Window>

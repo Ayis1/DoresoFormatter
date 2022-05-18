@@ -23,8 +23,7 @@ namespace DoresoFormatter
         readonly string idle = new("Awaiting input");
         string csvPath = new("");
         string outputPath = new("");
-        string playlistTitle = new("");
-        List<String> results;       
+        List<String> results;
 
         public MainWindow()
         {
@@ -88,7 +87,6 @@ namespace DoresoFormatter
                 }
             }
             string fileName = "DoresoParse - " + DateTime.Now.ToString("yyyy-dd-M HH-mm-ss") + ".txt";
-            playlistTitle = fileName.Replace(".txt", "");
             if (!File.Exists(outputPath))
             {
                 using StreamWriter stream = File.CreateText(outputPath + "\\" + fileName);
@@ -96,37 +94,11 @@ namespace DoresoFormatter
                 {
                     await stream.WriteLineAsync(result);
                 }
-                Console.AppendText(Environment.NewLine + "Successfully wrote " + results.Count + " songs to " + fileName + " from CSV " + csvPath + 
+                Console.AppendText(Environment.NewLine + "Successfully wrote " + results.Count + " songs to " + fileName + " from CSV " + csvPath +
                     Environment.NewLine + "Create new playlist available");
                 CreatePlaylist.IsEnabled = true;
+                playListName.IsEnabled = true;
             }
-        }
-
-        private static string ParsedSongText(string? artist, string? url, string? title)
-        {
-            return "Arist: " + artist + Environment.NewLine + "Title: " + title + Environment.NewLine + "Link: " + url + Environment.NewLine + Environment.NewLine;
-        }
-
-        private void PreParseConsoleInfo(string entry)
-        {
-            Console.AppendText(Environment.NewLine + entry);
-
-            if (csvPath != "" && outputPath != "")
-            {
-                Console.AppendText(Environment.NewLine + "Ready to parse CSV");
-                ParseCSVBtn.IsEnabled = true;
-            }
-        }
-
-        private void ClearConsole(object sender, RoutedEventArgs e)
-        {
-            Console.Clear();
-            Console.Text = idle;
-        }
-
-        private void Console_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            Console.ScrollToEnd();
         }
 
         private async Task<string> GetYoutubeURLAsync(string? link)
@@ -157,22 +129,29 @@ namespace DoresoFormatter
 
         private async void CreatePlaylist_Click(object sender, RoutedEventArgs e)
         {
-            Console.AppendText(Environment.NewLine + "Creating playlist " + playlistTitle);
-            try
+            if (playListName.Text == "" || playListName.Text == null || playListName.Text == "Enter new playlist name")
             {
-                await CreateNewPlaylist(results, playlistTitle);
+                Console.AppendText(Environment.NewLine + "Please enter playlist title below before attempting playlist creation");
             }
-            catch (AggregateException ex)
+            else
             {
-                Console.AppendText( Environment.NewLine + "Playlist creation failed.");
-                foreach (var error in ex.InnerExceptions)
+                Console.AppendText(Environment.NewLine + "Creating playlist " + playListName.Text);
+                try
                 {
-                    Console.AppendText(Environment.NewLine + "Error: " + error.Message);
+                    await CreateNewPlaylist(results);
+                }
+                catch (AggregateException ex)
+                {
+                    Console.AppendText(Environment.NewLine + "Playlist creation failed.");
+                    foreach (var error in ex.InnerExceptions)
+                    {
+                        Console.AppendText(Environment.NewLine + "Error: " + error.Message);
+                    }
                 }
             }
         }
 
-        public async Task CreateNewPlaylist(List<string> playlist, string playlistTitle)
+        public async Task CreateNewPlaylist(List<string> playlist)
         {
             UserCredential credential;
             using (var stream = new FileStream(@"C:\Users\insrt\source\repos\AhaFormatter\AhaFormatter\client_secrets.json", FileMode.Open, FileAccess.Read))
@@ -195,13 +174,13 @@ namespace DoresoFormatter
 
             Playlist newPlaylist = new();
             newPlaylist.Snippet = new PlaylistSnippet();
-            newPlaylist.Snippet.Title = playlistTitle;
+            newPlaylist.Snippet.Title = playListName.Text;
             newPlaylist.Snippet.Description = "A playlist created with my DoresoFormatter";
             newPlaylist.Status = new PlaylistStatus();
             newPlaylist.Status.PrivacyStatus = "private";
             newPlaylist = await youtubeService.Playlists.Insert(newPlaylist, "snippet,status").ExecuteAsync();
 
-            Console.AppendText(Environment.NewLine + "Created new playlist " + playlistTitle);
+            Console.AppendText(Environment.NewLine + "Created new playlist " + playListName.Text);
 
             foreach (string song in playlist)
             {
@@ -219,7 +198,7 @@ namespace DoresoFormatter
                         songItem.Snippet.ResourceId.Kind = "youtube#video";
                         songItem.Snippet.ResourceId.VideoId = idOnly;
                         songItem = await youtubeService.PlaylistItems.Insert(songItem, "snippet").ExecuteAsync();
-                        Console.AppendText(Environment.NewLine + "Added " + songItem.Snippet.Title + " to " + playlistTitle);
+                        Console.AppendText(Environment.NewLine + "Added " + songItem.Snippet.Title + " to " + playListName.Text);
                     }
                     catch (GoogleApiException ex)
                     {
@@ -228,6 +207,33 @@ namespace DoresoFormatter
                 }
             }
             Console.AppendText(Environment.NewLine + "Finished creating playlist.");
+        }
+
+        private static string ParsedSongText(string? artist, string? url, string? title)
+        {
+            return "Arist: " + artist + Environment.NewLine + "Title: " + title + Environment.NewLine + "Link: " + url + Environment.NewLine + Environment.NewLine;
+        }
+
+        private void PreParseConsoleInfo(string entry)
+        {
+            Console.AppendText(Environment.NewLine + entry);
+
+            if (csvPath != "" && outputPath != "")
+            {
+                Console.AppendText(Environment.NewLine + "Ready to parse CSV");
+                ParseCSVBtn.IsEnabled = true;
+            }
+        }
+
+        private void ClearConsole(object sender, RoutedEventArgs e)
+        {
+            Console.Clear();
+            Console.Text = idle;
+        }
+
+        private void Console_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            Console.ScrollToEnd();
         }
     }
 }
