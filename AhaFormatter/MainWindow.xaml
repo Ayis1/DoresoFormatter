@@ -18,6 +18,8 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="5"/>
             <RowDefinition Height="20"/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="150"/>
@@ -39,12 +41,15 @@
         <Button x:Name="ParseCSVBtn" Grid.Row="4" IsEnabled="False" Click="ParseCSV">
             Parse CSV
         </Button>
-        <Button Grid.Row="8" Click="ClearConsole">
-            Clear console
+        <Button Grid.Row="10" Click="ClearConsole">
+            Clear/reset
         </Button>
         <Button x:Name="CreatePlaylist" Grid.Row="8" Grid.Column="2" Width="150" HorizontalAlignment="Left" IsEnabled="False" Click="CreatePlaylist_Click">
             Create Youtube playlist
         </Button>
         <TextBox Grid.Column="4" x:Name="playListName" Grid.Row="8" Text="Enter new playlist name" IsEnabled="False"/>
+        <Button x:Name="RemoveDuplicates" Grid.Row="8" IsEnabled="False" Click="RemoveDuplicates_Click">
+            Remove Duplicates
+        </Button>
     </Grid>
 </Window>

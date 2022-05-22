@@ -15,6 +15,8 @@ using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using System.Threading;
 using Google;
+using System.Linq;
+using DoresoFormatter.Model;
 
 namespace DoresoFormatter
 {
@@ -98,7 +100,19 @@ namespace DoresoFormatter
                     Environment.NewLine + "Create new playlist available");
                 CreatePlaylist.IsEnabled = true;
                 playListName.IsEnabled = true;
+                if(results.Count != results.Distinct().Count())
+                {
+                    int duplicates = results.Count - results.Distinct().Count();
+                    Console.AppendText(Environment.NewLine + "(" + duplicates + ")" + " duplicates detected, remove duplicates available before creating playlist");
+                    RemoveDuplicates.IsEnabled = true;
+                }
             }
+        }
+
+        private void RemoveDuplicates_Click(object sender, RoutedEventArgs e)
+        {
+            results = results.Distinct().ToList();
+            Console.AppendText(Environment.NewLine + "Duplicates removed");
         }
 
         private async Task<string> GetYoutubeURLAsync(string? link)
@@ -113,10 +127,6 @@ namespace DoresoFormatter
             {
                 html = sr.ReadToEnd();
             }
-
-            // RegEx to find youtube URL from site.
-            // Example format is https://www.youtube.com/embed/wAVEWJTJdIA
-            // Transform substring into clickable link. replace /embed/ with /watch?v=
 
             Regex reg = new(@"youtube.com/embed/[A-Za-z0-9\-_]{11}");
             if (reg.IsMatch(html))
@@ -157,6 +167,7 @@ namespace DoresoFormatter
             using (var stream = new FileStream(@"C:\Users\insrt\source\repos\AhaFormatter\AhaFormatter\client_secrets.json", FileMode.Open, FileAccess.Read))
             {
                 //Will throw null reference exception if client_secrets.json path is not correct.
+                //Use/get own client secrets as mine is in .gitignore and wont be pushed to git.
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
                     GoogleClientSecrets.FromStream(stream).Secrets,
                     new[] { YouTubeService.Scope.Youtube },
@@ -229,6 +240,11 @@ namespace DoresoFormatter
         {
             Console.Clear();
             Console.Text = idle;
+            csvPath = "";
+            outputPath = "";
+            List<String> results = new();
+            OutputText.Text = "Select ...";
+            FilenameText.Text = "Select ...";
         }
 
         private void Console_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
